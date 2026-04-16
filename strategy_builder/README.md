@@ -393,3 +393,5 @@ Strategy Builder와 Backtester는 `.kis.yaml` 파일 포맷으로 연동되어 *
 | 포트폴리오 분석 | - | 분석/시각화 |
 | 파라미터 최적화 | - | Grid/Random |
 | **공유 포맷** | `.kis.yaml` Export | `.kis.yaml` Import |
+
+Backtester 상세 사용법은 [backtester/README.md](../backtester/README.md)를 참고하세요.
