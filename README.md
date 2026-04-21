@@ -193,6 +193,78 @@ Git은 빈 디렉터리를 추적하지 않습니다. `.gitkeep` 파일은 내�
 
 ---
 
+## 4. Java Project Settings Audit (2026-04-17)
+
+> 이 섹션은 `java/` 모듈의 현재 설정 상태를 감사(audit)한 결과를 기록합니다.
+> 자동 수정이 가능한 항목은 적용되었으며, 수동 작업이 필요한 항목은 별도 표시됩니다.
+
+### 4.1. 감사 항목별 현재 상태
+
+| 항목 | 경로 | 상태 | 비고 |
+|------|------|------|------|
+| build.gradle | `java/build.gradle` | ✅ 정상 | Spring Boot 3.3.0, Java 17, mainClass, web/test 스타터 모두 확인 |
+| settings.gradle | `java/settings.gradle` | ✅ 정상 | `rootProject.name = 'open-trading-api-hantu'` 확인 |
+| application.properties | `java/src/main/resources/application.properties` | ✅ 수정 완료 | `server.port=8080` 추가됨 (이하 참고) |
+| Gradle Wrapper | `java/gradlew`, `java/gradle/wrapper/` | ⚠️ 부재 | 수동 생성 필요 (이하 참고) |
+| 디렉터리 구조 | `java/src/main/java/com/hantu/trading/` | ✅ 정상 | controller/service/repository/domain 패키지 모두 존재 |
+| 테스트 디렉터리 | `java/src/test/java/com/hantu/trading/` | ✅ 구조 존재 | `.gitkeep` 플레이스홀더만 있음 — 테스트 클래스 미작성 |
+
+---
+
+### 4.2. 자동 수정 내역
+
+#### application.properties — `server.port` 추가
+
+`java/src/main/resources/application.properties` 파일에 `server.port=8080`이 없었습니다.
+Spring Boot는 기본값으로 8080을 사용하지만, 명시적 선언이 없으면 환경 의존도가 높아집니다.
+
+**수정 내용 (자동 적용):**
+
+```properties
+spring.application.name=open-trading-api-hantu
+server.port=8080
+```
+
+---
+
+### 4.3. 수동 조치가 필요한 항목
+
+#### Gradle Wrapper 부재
+
+`java/gradlew`, `java/gradlew.bat`, `java/gradle/wrapper/gradle-wrapper.properties` 파일이 존재하지 않습니다.
+
+이 상태에서는 `./gradlew build` 또는 `./gradlew bootRun` 명령이 실패합니다.
+CI/CD 파이프라인에서도 wrapper 파일 없이는 빌드가 불가능합니다.
+
+**수동 생성 방법:**
+
+```bash
+# java/ 디렉터리 내에서 실행
+cd java
+gradle wrapper --gradle-version 8.7
+```
+
+> Gradle이 로컬에 설치되어 있어야 합니다 (권장: Gradle 8.x).
+> 생성 후 `java/gradlew`, `java/gradlew.bat`, `java/gradle/wrapper/gradle-wrapper.properties`, `java/gradle/wrapper/gradle-wrapper.jar` 파일을 Git에 커밋하세요.
+
+---
+
+### 4.4. 주의: 기존 README 섹션 3 과의 불일치
+
+섹션 3 (Java 기반 API 서비스) 는 초기 설계 계획 단계에 작성된 내용으로, 현재 구현 상태와 다음과 같은 차이가 있습니다:
+
+| 항목 | 섹션 3 기재 내용 | 실제 현재 상태 |
+|------|-----------------|---------------|
+| JDK 버전 | JDK 21 (LTS) | Java 17 (`sourceCompatibility = '17'`) |
+| 패키지 경로 | `com/kis/openapi` | `com/hantu/trading` |
+| 설정 파일 | `application.yml` | `application.properties` |
+| 구현 상태 | "설계 계획 단계" | Spring Boot 3.3.0 스켈레톤 구현 완료 |
+| Gradle Wrapper | "Deferred(지연)" 목록 항목 | 여전히 부재 — 수동 생성 필요 |
+
+> 섹션 3의 내용은 현재 구현 현실과 다릅니다. 이 섹션 4의 내용이 현재 상태를 반영합니다.
+
+---
+
 # 📧 문의사항
 
 - [💬 한국투자증권 Open API 챗봇](https://chatgpt.com/g/g-68b920ee7afc8191858d3dc05d429571-hangugtujajeunggweon-open-api-seobiseu-gpts)에 언제든 궁금한 점을 물어보세요.
